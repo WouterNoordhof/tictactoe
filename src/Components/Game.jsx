@@ -15,7 +15,14 @@ class Game extends Component {
         };
       }
 
-    handleClick(i) {
+    async handleClick(i) {
+      this.handleUserMove(i)
+      .then(() => {
+        this.handleBotMove(i)
+      })
+    }
+
+    async handleUserMove(i) {
         const history = this.state.history.slice(0, this.state.stepNumber + 1)
         const current = history[history.length - 1]
         const squares = current.squares.slice()
@@ -39,15 +46,20 @@ class Game extends Component {
       const history = this.state.history.slice(0, this.state.stepNumber + 1)
       const current = history[history.length - 1]
       const squares = current.squares.slice()
+      console.log(`O index: ${prevSquare + 1} | array lenght: ${squares.length}`)
 
       if(this.state.xIsNext) {
         return
       }
-      if (!squares[prevSquare] + 1) {
+
+      if(prevSquare + 1 >= squares.length) {
+        squares[this.findFirstEmpty(squares)] = "O"
+      } else if (!squares[prevSquare] + 1) {
         squares[prevSquare + 1] = "O"
       } else {
         squares[this.findFirstEmpty(squares)] = "O"
       }
+
       this.setState({
         history: history.concat([
           {
@@ -60,11 +72,21 @@ class Game extends Component {
     }
 
     findFirstEmpty(squares) {
-      squares.forEach((square, i) => {
-        if(square !== "X" && square !== "O") {
-          return i
+      let empty = 0
+      for(let i = 0; i < squares.length; i++) {
+        console.log(`${i}`)
+
+        if(squares[i] !== "X" && squares[i] !== "O") {
+          console.log(`found empty: ${i}`)
+          empty = i
+          break
         }
-      })
+      }
+      return empty
+    }
+
+    findEmpty(square) {
+      return !square === 'X' || !square === 'O'
     }
 
     jumpTo(step) {
